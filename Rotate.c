@@ -1,5 +1,7 @@
 // libraries
 # include <stdio.h>
+# include <stdlib.h>
+# include <signal.h>
 # include <ncurses.h>
 # include "RotateFunc.h"
 
@@ -8,12 +10,11 @@ int main() {
 	int levelOne = 1;
 	int levelTwo = 2;
 	int levelThree = 3;
-	// Initializing screen
+	
 	initscr();
-	// Calling splash screen
+	start_color();
 	splashscreen();
 	getch();
-	// Calling level one
 	display_level(levelOne);
 	getch();
 	// Calling level two
