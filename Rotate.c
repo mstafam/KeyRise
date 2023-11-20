@@ -12,6 +12,7 @@ int main() {
 	int levelThree = 3;
 	
 	initscr();
+	curs_set(0);
 	start_color();
 	splashscreen();
 	clear();
