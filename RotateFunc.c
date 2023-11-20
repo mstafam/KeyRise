@@ -69,7 +69,10 @@ void splashscreen() {
                 highlight = highlight < 2 ? highlight + 1 : 0;
                 break;
             case 10: // Enter key
-                if (highlight == 1) { // If "How to Play" is selected
+		if (highlight == 0) {
+			return;
+		}
+		else if (highlight == 1) { // If "How to Play" is selected
                     how_to_play(); // Call the function to display the instructions
                     // Redraw the splash screen after returning from the instructions
                     wbkgd(splash, COLOR_PAIR(1)); 
@@ -83,8 +86,6 @@ void splashscreen() {
                 break;
         }
     }
-    // Cleanup
-    delwin(splash);
 }
 
 
@@ -114,8 +115,11 @@ void endscreen() {
         refresh();
         box(endscreen, 0, 0);
         wrefresh(endscreen);
-        mvwprintw(endscreen, 1, 1, "End Screen");
-        wrefresh(endscreen);
+        mvwprintw(endscreen, 1, 1, "You Win! Click any key to exit.");
+	wrefresh(endscreen);
+	getch();
+	endwin();
+	exit(0);
 }
 
 void level1(int yMax, int xMax) {
