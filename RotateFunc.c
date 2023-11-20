@@ -10,8 +10,12 @@ void how_to_play() {
     int yMax, xMax;
     getmaxyx(stdscr, yMax, xMax);
 
+    init_pair(1, COLOR_BLUE, COLOR_BLACK);
+
     WINDOW *howWin = newwin(30, 80, (yMax - 30) / 2, (xMax - 80) / 2);
+    wattron(howWin, COLOR_PAIR(1));
     box(howWin, 0, 0);
+    wattroff(howWin, COLOR_PAIR(1));
     
     // Add your instructions here
     mvwprintw(howWin, 1, 1, "How to Play:");
@@ -39,9 +43,12 @@ void splashscreen() {
     init_pair(3, COLOR_RED, COLOR_BLACK);
 
     WINDOW *splash = newwin(30, 80, (yMax - 30) / 2, (xMax - 80) / 2);
+    refresh();
     keypad(splash, true); // Enable keyboard input for the window
     wbkgd(splash, COLOR_PAIR(1)); 
+    wattron(splash, COLOR_PAIR(1));
     box(splash, 0, 0); 
+    wattroff(splash, COLOR_PAIR(1)); // Turn off red color pair
 
     // Display the game title
     wattron(splash, COLOR_PAIR(3));
@@ -92,8 +99,6 @@ void splashscreen() {
                     how_to_play(); // Call the function to display the instructions
                     // Redraw the splash screen after returning from the instructions
                     clear();
-                    wbkgd(splash, COLOR_PAIR(3)); 
-                    wattron(splash, COLOR_PAIR(1));
                     box(splash, 0, 0); 
                     wrefresh(splash);
                 } else if (highlight == 2) { // If "Exit" is selected
@@ -151,15 +156,67 @@ void level1(int yMax, int xMax) {
 	wrefresh(level1);
 }
 
+
 void level2(int yMax, int xMax) {
-	// Creating level2 window and box
-	WINDOW *level2 = newwin(30, 80, yMax/2 - 15, xMax/2 - 40);
-	refresh();
-	box(level2, 0, 0);
-	wrefresh(level2);
-	mvwprintw(level2, 1, 1, "Level 2");
-	wrefresh(level2);
+    
+    WINDOW *level2 = newwin(30, 80, (yMax - 30) / 2, (xMax - 80) / 2);
+    refresh();
+    
+
+    start_color();
+    init_pair(1, COLOR_BLUE, COLOR_BLACK); 
+    init_pair(4, COLOR_RED, COLOR_BLACK);   
+    init_pair(5, COLOR_YELLOW, COLOR_BLACK); 
+
+
+    wattron(level2, COLOR_PAIR(4)); 
+    box(level2, 0, 0);
+    wattroff(level2, COLOR_PAIR(4)); 
+
+    
+    wattron(level2, COLOR_PAIR(5)); 
+
+    int x = 1;
+    int y = 15;
+    bool UP = true;
+
+    
+    while (x < 70) {
+        
+        mvwprintw(level2, y, x, " ___  ___  ___  ___ ");
+        mvwprintw(level2, y + 1, x, "(___)(___)(___)(___)");
+
+        if (UP == true){
+            y-=5;
+            UP = false;
+        } else{
+            y+=5;
+            UP = true;
+        }
+        x += 26;
+    }
+
+    mvwprintw(level2, 15, 73, " ___ ");
+    mvwprintw(level2, 16, 73, "(___)");
+
+    wattroff(level2, COLOR_PAIR(5)); 
+
+    // Draw lava
+    wattron(level2, COLOR_PAIR(4)); 
+    for (int i = 1; i < 79; ++i) { 
+        mvwprintw(level2, 27, i, "8");
+        mvwprintw(level2, 28, i, "8");
+    }
+
+    wattroff(level2, COLOR_PAIR(4)); 
+    mvwprintw(level2, 9, 36, "O-X");
+    wrefresh(level2);
+    mvwprintw(level2, 5, 30, "Level 2: Lava World");
+    wrefresh(level2);
+
 }
+
+
 
 void level3(int yMax, int xMax) {
 	// Creating level3 window and box
