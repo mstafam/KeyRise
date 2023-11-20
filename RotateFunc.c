@@ -36,11 +36,21 @@ void splashscreen() {
     start_color();
     init_pair(1, COLOR_BLUE, COLOR_BLACK);
     init_pair(2, COLOR_WHITE, COLOR_BLACK);
+    init_pair(3, COLOR_RED, COLOR_BLACK);
 
     WINDOW *splash = newwin(30, 80, (yMax - 30) / 2, (xMax - 80) / 2);
     keypad(splash, true); // Enable keyboard input for the window
     wbkgd(splash, COLOR_PAIR(1)); 
     box(splash, 0, 0); 
+
+    // Display the game title
+    wattron(splash, COLOR_PAIR(3));
+    mvwprintw(splash, 5, 15, "   ___  ____  _________ __________    ___  ___ ");
+    mvwprintw(splash, 6, 15, "  / _ \\/ __ \\/_  __/ _ /_  __/ __/___/ _ \\/ _ \\");
+    mvwprintw(splash, 7, 15, " / , _/ /_/ / / / / __ |/ / / _//___/\\_, / // /");
+    mvwprintw(splash, 8, 15, "/_/|_|\\____/ /_/ /_/ |_/_/ /___/    /___/\\___/ ");
+    wattroff(splash, COLOR_PAIR(3)); // Turn off red color pair
+
 
     char *choices[] = {"Play", "How to Play", "Exit"};
     int choice;
@@ -53,7 +63,7 @@ void splashscreen() {
             else
                 wattron(splash, COLOR_PAIR(2)); // Apply white color to text
             
-            mvwprintw(splash, 9 + i * 2, (80 - strlen(choices[i])) / 2, "%s", choices[i]);
+            mvwprintw(splash, 12 + i * 2, (80 - strlen(choices[i])) / 2, "%s", choices[i]);
             wattroff(splash, COLOR_PAIR(2)); // Turn off white color for other items
             wattroff(splash, A_REVERSE); // Turn off highlight
         }
@@ -63,10 +73,16 @@ void splashscreen() {
 
         switch(choice) {
             case KEY_UP:
-                highlight = highlight > 0 ? highlight - 1 : 2;
+                if (highlight > 0)
+                    highlight -= 1;
+                else
+                    highlight = 2;
                 break;
             case KEY_DOWN:
-                highlight = highlight < 2 ? highlight + 1 : 0;
+                if (highlight < 2)
+                    highlight += 1;
+                else
+                    highlight = 0;
                 break;
             case 10: // Enter key
 		if (highlight == 0) {
@@ -75,7 +91,9 @@ void splashscreen() {
 		else if (highlight == 1) { // If "How to Play" is selected
                     how_to_play(); // Call the function to display the instructions
                     // Redraw the splash screen after returning from the instructions
-                    wbkgd(splash, COLOR_PAIR(1)); 
+                    clear();
+                    wbkgd(splash, COLOR_PAIR(3)); 
+                    wattron(splash, COLOR_PAIR(1));
                     box(splash, 0, 0); 
                     wrefresh(splash);
                 } else if (highlight == 2) { // If "Exit" is selected
@@ -87,6 +105,7 @@ void splashscreen() {
         }
     }
 }
+
 
 
 
