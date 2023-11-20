@@ -14,20 +14,27 @@ int main() {
 	initscr();
 	start_color();
 	splashscreen();
-	getch();
+	clear();
+	refresh();
 	display_level(levelOne);
 	getch();
+	clear();
+	refresh();
 	// Calling level two
 	display_level(levelTwo);
 	getch();
+	clear();
+	refresh();
 	// Calling level three
 	display_level(levelThree);
 	getch();
+	clear();
+	refresh();
 	// Calling the endscreen
 	endscreen();
 	getch();
-	// Closing window
-	endwin();
+	clear();
+	refresh();
 	// Return 0
 	return 0;
 }
