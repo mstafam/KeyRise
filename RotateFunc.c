@@ -139,7 +139,7 @@ void endscreen() {
         refresh();
         box(endscreen, 0, 0);
         wrefresh(endscreen);
-        mvwprintw(endscreen, 1, 1, "You Win! Click any key to exit.");
+        mvwprintw(endscreen, 15, 24, "You Win! Click any key to exit.");
 	wrefresh(endscreen);
 	getch();
 	endwin();
@@ -148,43 +148,46 @@ void endscreen() {
 
 void level1(int yMax, int xMax) {
 	// Creating level1 window and box
+	init_pair(1, COLOR_GREEN, COLOR_GREEN);
+	init_pair(2, COLOR_BLUE, COLOR_BLUE);
+	init_pair(3, COLOR_WHITE, COLOR_BLUE);
 	WINDOW *level1 = newwin(30, 80, yMax/2 - 15, xMax/2 - 40);
+	wbkgd(level1, COLOR_PAIR(2));
 	refresh();
-	box(level1, 0, 0);
+	wattron(level1, COLOR_PAIR(3));
 	wrefresh(level1);
-	mvwprintw(level1, 1, 1, "Level 1");
+	mvwprintw(level1, 18, 40, "o-X");
+	mvwprintw(level1, 5, 29, "Level 1: Grassy Plains");
+	wattroff(level1, COLOR_PAIR(3));
+	wattron(level1, COLOR_PAIR(1));
+	int x = 0;
+	while (x < 74) {
+		//mvwprintw(level1, 19, x+1, "______");
+        	mvwprintw(level1, 20, x, "|______|");
+		x += 6;
+	}
+	wattroff(level1, COLOR_PAIR(1));
 	wrefresh(level1);
 }
 
 
 void level2(int yMax, int xMax) {
-    
+    init_pair(4, COLOR_RED, COLOR_RED);   
+    init_pair(5, COLOR_YELLOW, COLOR_YELLOW); 
+    init_pair(6, COLOR_WHITE, COLOR_RED);
+
     WINDOW *level2 = newwin(30, 80, (yMax - 30) / 2, (xMax - 80) / 2);
-    refresh();
-    
-
-    start_color();
-    init_pair(1, COLOR_BLUE, COLOR_BLACK); 
-    init_pair(4, COLOR_RED, COLOR_BLACK);   
-    init_pair(5, COLOR_YELLOW, COLOR_BLACK); 
-
-
-    wattron(level2, COLOR_PAIR(4)); 
-    box(level2, 0, 0);
-    wattroff(level2, COLOR_PAIR(4)); 
-
-    
-    wattron(level2, COLOR_PAIR(5)); 
+    wbkgd(level2, COLOR_PAIR(4));
+    refresh(); 
 
     int x = 1;
     int y = 15;
     bool UP = true;
-
     
-    while (x < 70) {
-        
-        mvwprintw(level2, y, x, " ___  ___  ___  ___ ");
-        mvwprintw(level2, y + 1, x, "(___)(___)(___)(___)");
+    wattron(level2, COLOR_PAIR(5));
+    while (x < 70) { 
+        //mvwprintw(level2, y, x, " ___  ___  ___  ___ ");
+        mvwprintw(level2, y + 1, x, "|___||___||___||___|");
 
         if (UP == true){
             y-=5;
@@ -196,9 +199,8 @@ void level2(int yMax, int xMax) {
         x += 26;
     }
 
-    mvwprintw(level2, 15, 73, " ___ ");
-    mvwprintw(level2, 16, 73, "(___)");
-
+    //mvwprintw(level2, 15, 73, " ___ ");
+    mvwprintw(level2, 16, 72, "|___|");
     wattroff(level2, COLOR_PAIR(5)); 
 
     // Draw lava
@@ -208,22 +210,50 @@ void level2(int yMax, int xMax) {
         mvwprintw(level2, 28, i, "8");
     }
 
-    wattroff(level2, COLOR_PAIR(4)); 
+    wattroff(level2, COLOR_PAIR(4));
+    wattron(level2, COLOR_PAIR(6));
     mvwprintw(level2, 9, 36, "O-X");
-    wrefresh(level2);
+    mvwprintw(level2, 14, 9, "O-X");
     mvwprintw(level2, 5, 30, "Level 2: Lava World");
+    wattroff(level2, COLOR_PAIR(6));
     wrefresh(level2);
 
 }
 
-
-
 void level3(int yMax, int xMax) {
 	// Creating level3 window and box
+	init_pair(1, COLOR_BLACK, COLOR_BLACK);
+	init_pair(2, COLOR_WHITE, COLOR_BLACK);
+	init_pair(3, COLOR_WHITE, COLOR_WHITE);
 	WINDOW *level3 = newwin(30, 80, yMax/2 - 15, xMax/2 - 40);
+	wbkgd(level3, COLOR_PAIR(1));
 	refresh();
-	box(level3, 0, 0);
-	wrefresh(level3);
-	mvwprintw(level3, 1, 1, "Level 3");
+	wattron(level3, COLOR_PAIR(2));
+	mvwprintw(level3, 5, 29, "Level 3: Dark Dungeons");
+	wattron(level3, COLOR_PAIR(2));
+	int x = 1, y = 19;
+	bool UP = true;
+	wattron(level3, COLOR_PAIR(3));
+	while (x < 68 && y < 30) {
+                mvwprintw(level3, y+1, x, "|____|");
+                mvwprintw(level3, y+1, x+6, "|____|");
+
+		if (UP == true) {
+			y -= 3;
+			UP = false;
+		} else {
+			y += 3;
+			UP = true;
+		}
+                x += 12;
+	}
+
+	mvwprintw(level3, y-2, x, "|____|");
+	wattroff(level3, COLOR_PAIR(3));
+	wattron(level3, COLOR_PAIR(2));
+	mvwprintw(level3, 18, 5, "o-X");
+	mvwprintw(level3, 15, 42, "o-X");
+	mvwprintw(level3, 15, 69, "o-X");
+	wattroff(level3, COLOR_PAIR(2));
 	wrefresh(level3);
 }
