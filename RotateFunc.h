@@ -1,5 +1,9 @@
-// Function Prototypes
+/*
+ * Names: Mustafa Mohamed, Sami Elsayed
+ * Lab: 9-11
+ */
 
+// Function Prototypes
 
 /*
  * purpose: Display the splash screen with game title and menu options

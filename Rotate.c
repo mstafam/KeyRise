@@ -1,3 +1,8 @@
+/*
+ * Names: Mustafa Mohamed, Sami Elsayed
+ * Lab: 9-11
+ */
+
 // libraries
 # include <stdio.h>
 # include <stdlib.h>
@@ -10,13 +15,16 @@ int main() {
 	int levelOne = 1;
 	int levelTwo = 2;
 	int levelThree = 3;
-	
+	// Initializing ncurses
 	initscr();
 	curs_set(0);
+	// Enabling color
 	start_color();
+	// Calling splashscreen
 	splashscreen();
 	clear();
 	refresh();
+	// Calling level one
 	display_level(levelOne);
 	getch();
 	clear();
