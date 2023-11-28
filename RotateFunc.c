@@ -10,6 +10,8 @@
 #include "RotateFunc.h"
 #include <string.h>
 #include <unistd.h>
+#include <time.h>
+
 
 void how_to_play() {
     clear();
@@ -353,7 +355,7 @@ void quit_prompt(int level) {
 	wbkgd(quitWindow, COLOR_PAIR(1));
 	// Display the quit prompt in the new window
 	mvwprintw(quitWindow, 1, 2, "Do you really want to quit? (y/n): ");
-    	wrefresh(quitWindow); // Refresh only the prompt window
+    wrefresh(quitWindow); // Refresh only the prompt window
 	// Getting user input
 	char confirm;
 
@@ -378,72 +380,111 @@ void quit_prompt(int level) {
 }
 
 void user_input(int yMax, int xMax, int level) {
-	int numKeys = 0, reqKeys;
-	// Staring Coords
-	int yCoord = (yMax/2 - 15) + 18, xCoord = (xMax/2 - 40) + 1;
-	char ch;
-	bool atDoor = false;
-	char *player = malloc(sizeof(char));
-	
-	// Sets the colour scheme depending on level
-	if (level == 1) {
-		reqKeys = 1;
-		init_pair(1, COLOR_WHITE, COLOR_BLUE);
-	} else if (level == 2) {
-		reqKeys = 2;
-		init_pair(1, COLOR_WHITE, COLOR_RED);
-	} else if (level == 3) {
-		reqKeys = 3;
-		init_pair(1, COLOR_WHITE, COLOR_BLACK);
-	}
+    int numKeys = 0, reqKeys;
+    int yCoord = (yMax/2 - 15) + 18, xCoord = (xMax/2 - 40) + 1;
+    char ch;
+    bool atDoor = false;
+    char *player = malloc(sizeof(char));
+    
+    // Key position for level 1 
+    int keyX = 135, keyY = 21; 
 
-	attron(COLOR_PAIR(1));
-	// Creates player and displays it on screen
-	*player = '&';
-        mvaddch(yCoord, xCoord, *player);
-	do {
-		ch = getch();
-		
-		// Doing quit prompt if 'q' is pressed
-		if (ch == 'q') {
-			quit_prompt(level);
-		
-		// Doing pause prompt if 'p' is pressed
-		} else if (ch == 'p') {
-			pause_prompt(level);
-		
-		// Jump
-		} else if (ch == KEY_UP || ch == ' ') {
-			if (at_boundry(yCoord-1, xCoord) == 0) {
-				mvaddch(yCoord, xCoord, ' ');
-				yCoord-=1;
-				mvaddch(yCoord, xCoord, *player);
-			}
+    // Sets the colour scheme depending on level
+    if (level == 1) {
+        reqKeys = 1;
+        init_pair(1, COLOR_WHITE, COLOR_BLUE);
+    } else if (level == 2) {
+        reqKeys = 2;
+        init_pair(1, COLOR_WHITE, COLOR_RED);
+    } else if (level == 3) {
+        reqKeys = 3;
+        init_pair(1, COLOR_WHITE, COLOR_BLACK);
+    }
 
-		// Move Right
-		} else if (ch == KEY_RIGHT || ch == 'd') {
-			if (at_boundry(yCoord, xCoord+1) == 0) {
-				mvaddch(yCoord, xCoord, ' ');
-				xCoord++;
-				mvaddch(yCoord, xCoord, *player);
-			}
+    attron(COLOR_PAIR(1));
+    *player = '&';
+    mvaddch(yCoord, xCoord, *player);
 
-		// Move Left
-		} else if (ch == KEY_LEFT || ch == 'a') {
-			if (at_boundry(yCoord, xCoord-1) == 0) {
-				mvaddch(yCoord, xCoord, ' ');
-				xCoord--;
-				mvaddch(yCoord, xCoord, *player);
-			}
+    mvprintw(0, 0, "Keys Collected: 0");
 
-		// Move Down
-		} else if (ch == KEY_DOWN || ch == 's') {
-			if (at_boundry(yCoord, xCoord+1) == 0) {
-				mvaddch(yCoord, xCoord, ' ');
-				yCoord++;
-				mvaddch(yCoord, xCoord, *player);
-			}
-		}
+    do {
+        ch = getch();
+
+        mvprintw(1, 0, "Player Position: x=%d, y=%d", xCoord, yCoord);
+
+        if (ch == 'q') {
+            quit_prompt(level);
+
+        } else if (ch == 'p') {
+            pause_prompt(level);
+
+        // Jump
+        } else if (ch == KEY_UP || ch == 'w') { 
+
+            if (at_boundry(yCoord - 1, xCoord) == 0) {
+                mvaddch(yCoord, xCoord, ' '); 
+                yCoord--; 
+                mvaddch(yCoord, xCoord, *player); 
+                refresh();
+                sleep(1); 
+
+                // Check for additional key press for diagonal movement
+                nodelay(stdscr, TRUE); 
+                int next_ch = getch();
+                nodelay(stdscr, FALSE); 
+
+                if (next_ch == KEY_RIGHT || next_ch == 'd') { // Diagonal right
+                    if (at_boundry(yCoord, xCoord + 1) == 0) {
+                        mvaddch(yCoord, xCoord, ' ');
+                        xCoord++;
+                    }
+                } else if (next_ch == KEY_LEFT || next_ch == 'a') { // Diagonal left
+                    if (at_boundry(yCoord, xCoord - 1) == 0) {
+                        mvaddch(yCoord, xCoord, ' ');
+                        xCoord--;
+                    }
+                }
+
+                mvaddch(yCoord, xCoord, ' '); 
+                yCoord++; 
+                mvaddch(yCoord, xCoord, *player); 
+                refresh();
+                sleep(1); 
+            }
+
+        // Move Right
+        } else if (ch == KEY_RIGHT || ch == 'd') { 
+            if (at_boundry(yCoord, xCoord + 1) == 0) {
+                mvaddch(yCoord, xCoord, ' ');
+                xCoord++;
+                mvaddch(yCoord, xCoord, *player);
+                refresh();
+            }
+
+        // Move Left
+        } else if (ch == KEY_LEFT || ch == 'a') { 
+            if (at_boundry(yCoord, xCoord - 1) == 0) {
+                mvaddch(yCoord, xCoord, ' ');
+                xCoord--;
+                mvaddch(yCoord, xCoord, *player);
+                refresh();
+            }
+        }
+        //Checks if player is at key coordinate
+
+        if (yCoord == keyY && xCoord == keyX) {
+            numKeys++;
+            mvaddch(keyY, keyX, ' '); // Remove key from the screen
+            // Update status or score on the screen, if needed
+            mvprintw(0, 0, "Keys Collected: %d", numKeys);
+            
+        }
+
+        // Check if the player is at the door and has the required number of keys
+        if (xCoord == 173 && numKeys == reqKeys) {
+            atDoor = true;
+            break; // Exit the loop to transition to the next level
+        }
 
 		// Refresh
 		refresh();
