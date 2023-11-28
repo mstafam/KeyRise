@@ -1,3 +1,8 @@
+/*
+ * Names: Mustafa Mohamed, Sami Elsayed
+ * Lab: 9-11
+ */
+
 //libraries
 #include <stdio.h>
 #include <stdlib.h>
@@ -266,11 +271,11 @@ void level2(int yMax, int xMax) {
 }
 
 void level3(int yMax, int xMax) {
-
+    // Initialize color pairs
     init_pair(1, COLOR_BLACK, COLOR_BLACK);
     init_pair(2, COLOR_WHITE, COLOR_BLACK);
     init_pair(3, COLOR_WHITE, COLOR_WHITE);
-
+    // Creating window
     WINDOW *level3 = newwin(30, 80, yMax/2 - 15, xMax/2 - 40);
 
     wbkgd(level3, COLOR_PAIR(1));
@@ -303,6 +308,7 @@ void level3(int yMax, int xMax) {
     wattroff(level3, COLOR_PAIR(3));
 
     wattron(level3, COLOR_PAIR(2));
+    // Printing Keys
     mvwprintw(level3, 18, 5, "o-X");
     mvwprintw(level3, 15, 42, "o-X");
     mvwprintw(level3, 15, 69, "o-X");

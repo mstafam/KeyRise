@@ -1,4 +1,7 @@
-// Function Prototypes
+/*
+ * Names: Mustafa Mohamed, Sami Elsayed
+ * Lab: 9-11
+ */
 
 #ifndef ROTATEFUNC_H
 #define ROTATEFUNC_H
@@ -8,8 +11,6 @@ extern int player_y;
 extern char player_char;
 
 // ... [Rest of your function prototypes]
-
-
 
 /*
  * purpose: Display the splash screen with game title and menu options

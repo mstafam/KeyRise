@@ -1,3 +1,8 @@
+/*
+ * Names: Mustafa Mohamed, Sami Elsayed
+ * Lab: 9-11
+ */
+
 // libraries
 # include <stdio.h>
 # include <stdlib.h>
@@ -14,13 +19,13 @@ int main() {
 	int yMax, xMax;
 
   getmaxyx(stdscr, yMax, xMax);
-
 	initscr();
 
 	WINDOW *gameWindow = newwin(30, 80, (yMax - 30) / 2, (xMax - 80) / 2);
 	box(gameWindow, 0, 0);
 
 	curs_set(0);
+	// Enabling color
 	start_color();
 	curWindow++;
 	splashscreen();
