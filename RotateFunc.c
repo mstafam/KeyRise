@@ -7,12 +7,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ncurses.h>
-#include "RotateFunc.h" 
+#include "RotateFunc.h"
 #include <string.h>
-
+#include <unistd.h>
 
 void how_to_play() {
-
+    clear();
     int yMax, xMax;
     // Fetch the maximum screen dimensions
     getmaxyx(stdscr, yMax, xMax);
@@ -39,12 +39,14 @@ void how_to_play() {
 
     // Wait for a key press before closing the window
     wgetch(howWin);
+
+    refresh();
 }
 
 
 void splashscreen() {
+    // Getting terminal dimensions
     int yMax, xMax;
-
     getmaxyx(stdscr, yMax, xMax);
 
     // Initialize color pairs for later use
@@ -59,7 +61,7 @@ void splashscreen() {
     keypad(splash, true); // Enable keyboard input for the window
 
     // Apply blue background to the window and draw the border
-    wbkgd(splash, COLOR_PAIR(1)); 
+    wbkgd(splash, COLOR_PAIR(1));
     wattron(splash, COLOR_PAIR(1));
     box(splash, 0, 0);
     wattroff(splash, COLOR_PAIR(1));
@@ -94,7 +96,6 @@ void splashscreen() {
             // Turn off highlight attribute
             wattroff(splash, A_REVERSE);
 
-
         }
         wrefresh(splash);
 
@@ -106,18 +107,18 @@ void splashscreen() {
             // If the up arrow key is pressed
             if (highlight > 0)
                 // Move the highlight up in the menu
-                highlight -= 1; 
+                highlight -= 1;
             else
                 // Wrap around to the bottom of the menu
-                highlight = 2; 
+                highlight = 2;
         } else if (choice == KEY_DOWN) {
             // If the down arrow key is pressed
             if (highlight < 2)
                 // Move the highlight down in the menu
-                highlight += 1; 
+                highlight += 1;
             else
                 // Wrap around to the top of the menu
-                highlight = 0; 
+                highlight = 0;
 
         } else if (choice == 10) { // 10 Represents new line character, meaning 'Enter'
             if (highlight == 0) {
@@ -141,9 +142,11 @@ void splashscreen() {
             }
         }
     }
+    refresh();
 }
 
 void display_level(int i) {
+	clear();
 	// Calculting Max screen dimensions
 	int yMax, xMax;
 	getmaxyx(stdscr, yMax, xMax);
@@ -159,8 +162,8 @@ void display_level(int i) {
 	}
 }
 
-
 void endscreen() {
+	clear();
 	// Calculating max screen dimensions
 	int yMax, xMax;
 	getmaxyx(stdscr, yMax, xMax);
@@ -169,6 +172,7 @@ void endscreen() {
         refresh();
         box(endscreen, 0, 0);
         wrefresh(endscreen);
+	// print to endscreen
         mvwprintw(endscreen, 15, 24, "You Win! Click any key to exit.");
 	wrefresh(endscreen);
 	getch();
@@ -201,22 +205,22 @@ void level1(int yMax, int xMax) {
     // Loop to create a grassy ground pattern across the window
     int x = 0;
     while (x < 74) {
+	mvwprintw(level1, 19, x, "________");
         mvwprintw(level1, 20, x, "|______|");
         x += 6;
     }
 
     wattroff(level1, COLOR_PAIR(1));
-
     wrefresh(level1);
-
-    handle_input();
+    // Getting user input
+    user_input(yMax, xMax, 1);
 }
 
 void level2(int yMax, int xMax) {
 
-    // Initialize color pairs 
-    init_pair(4, COLOR_RED, COLOR_RED);   
-    init_pair(5, COLOR_YELLOW, COLOR_YELLOW); 
+    // Initialize color pairs
+    init_pair(4, COLOR_RED, COLOR_RED);
+    init_pair(5, COLOR_YELLOW, COLOR_YELLOW);
     init_pair(6, COLOR_WHITE, COLOR_RED);
 
     // Create a new window for level 2
@@ -229,12 +233,13 @@ void level2(int yMax, int xMax) {
     int x = 1;
     int y = 15;
     bool UP = true;
-    
+
     // Enable the orange color pair for drawing obstacles
     wattron(level2, COLOR_PAIR(5));
 
     // Loop to create platforms
     while (x < 70) {
+	mvwprintw(level2, y, x, " ___  ___  ___  ___  ___ ");
         mvwprintw(level2, y + 1, x, "|___||___||___||___|");
 
         if (UP) {
@@ -260,6 +265,7 @@ void level2(int yMax, int xMax) {
     wattroff(level2, COLOR_PAIR(4));
 
     wattron(level2, COLOR_PAIR(6));
+    // Printing keys
     mvwprintw(level2, 9, 36, "O-X");
     mvwprintw(level2, 14, 9, "O-X");
     mvwprintw(level2, 5, 30, "Level 2: Lava World");
@@ -268,6 +274,8 @@ void level2(int yMax, int xMax) {
 
     // Refresh and display level 2
     wrefresh(level2);
+    // Get user input
+    user_input(yMax, xMax, 2);
 }
 
 void level3(int yMax, int xMax) {
@@ -292,6 +300,8 @@ void level3(int yMax, int xMax) {
 
     // Loop to create platforms
     while (x < 68 && y < 30) {
+	mvwprintw(level3, y, x, "____");
+	mvwprintw(level3, y, x+6, "____");
         mvwprintw(level3, y+1, x, "|____|");
         mvwprintw(level3, y+1, x+6, "|____|");
 
@@ -317,60 +327,176 @@ void level3(int yMax, int xMax) {
 
     // Refresh and display level 3
     wrefresh(level3);
+    // Get user input
+    user_input(yMax, xMax, 3);
 }
 
-bool isPaused = false;
+void quit_prompt(int level) {
+	// Getting terminal dimensions
+	int yMax, xMax;
+	getmaxyx(stdscr, yMax, xMax);
 
-void show_quit_prompt() {
-    int yMax, xMax;
-    getmaxyx(stdscr, yMax, xMax);
-
-    // Create a small window for the quit prompt
-    WINDOW *quitWin = newwin(3, 50, yMax / 2 - 1, (xMax - 50) / 2);
-    box(quitWin, 0, 0); // Draw a border around the window
-
-    // Display the quit prompt in the new window
-    mvwprintw(quitWin, 1, 2, "Do you really want to quit? (y/n): ");
-    wrefresh(quitWin); // Refresh only the prompt window
-
-    char confirm = wgetch(quitWin);
-    delwin(quitWin); // Delete the quit prompt window
-
-    // Clear the part of the screen where the quit prompt was
-
-
-    refresh(); // Refresh the screen to reflect the changes
-
-    if (confirm == 'y') {
-        endwin();
-        exit(0);
-    }
-    
-    if (confirm == 'n'){
-        
-    }
-}
-
-
-void handle_input() {
-    char ch;
-    while (1) {
-        ch = getch(); // Get a character from the user
-
-        if (ch == 'q') {
-            show_quit_prompt();
-        } else if (ch == 'p') {
-            if (!isPaused) {
-                isPaused = true;
-                mvprintw(25, 0, "Game Paused. Press 'p' to resume.");
-                refresh(); // Refresh only the required part of the screen
-            } else {
-                isPaused = false;
-                // Do not clear the screen; just refresh if needed
-                refresh();
-            }
+	// Sets the colour scheme depending on level
+        if (level == 1) {
+                init_pair(1, COLOR_WHITE, COLOR_BLUE);
+        } else if (level == 2) {
+                init_pair(1, COLOR_WHITE, COLOR_RED);
+        } else if (level == 3) {
+                init_pair(1, COLOR_WHITE, COLOR_BLACK);
         }
 
-        // Additional game loop code goes here...
-    }
+	// Creating small quit prompt window
+	WINDOW *quitWindow = newwin(3, 50, yMax / 2 - 1, (xMax - 50) / 2);
+	box(quitWindow, 0, 0);
+	
+	// Setting background
+	wbkgd(quitWindow, COLOR_PAIR(1));
+	// Display the quit prompt in the new window
+	mvwprintw(quitWindow, 1, 2, "Do you really want to quit? (y/n): ");
+    	wrefresh(quitWindow); // Refresh only the prompt window
+	// Getting user input
+	char confirm;
+
+	// Looping until 'y' or 'n' are pressed
+	do {
+		confirm=wgetch(quitWindow);
+	} while (confirm != 'y' && confirm != 'n');
+
+	// Quitting if user types y
+	if (confirm == 'y') {
+		endwin();
+		exit(0);
+	// Resuming game if user types n
+	} else if (confirm == 'n') {
+		// Clear and refresh quitWindow
+		wclear(quitWindow);
+		wrefresh(quitWindow);
+
+		refresh();
+	}
+
+}
+
+void user_input(int yMax, int xMax, int level) {
+	int numKeys = 0, reqKeys;
+	// Staring Coords
+	int yCoord = (yMax/2 - 15) + 18, xCoord = (xMax/2 - 40) + 1;
+	char ch;
+	bool atDoor = false;
+	char *player = malloc(sizeof(char));
+	
+	// Sets the colour scheme depending on level
+	if (level == 1) {
+		reqKeys = 1;
+		init_pair(1, COLOR_WHITE, COLOR_BLUE);
+	} else if (level == 2) {
+		reqKeys = 2;
+		init_pair(1, COLOR_WHITE, COLOR_RED);
+	} else if (level == 3) {
+		reqKeys = 3;
+		init_pair(1, COLOR_WHITE, COLOR_BLACK);
+	}
+
+	attron(COLOR_PAIR(1));
+	// Creates player and displays it on screen
+	*player = '&';
+        mvaddch(yCoord, xCoord, *player);
+	do {
+		ch = getch();
+		
+		// Doing quit prompt if 'q' is pressed
+		if (ch == 'q') {
+			quit_prompt(level);
+		
+		// Doing pause prompt if 'p' is pressed
+		} else if (ch == 'p') {
+			pause_prompt(level);
+		
+		// Jump
+		} else if (ch == KEY_UP || ch == ' ') {
+			if (at_boundry(yCoord-1, xCoord) == 0) {
+				mvaddch(yCoord, xCoord, ' ');
+				yCoord-=1;
+				mvaddch(yCoord, xCoord, *player);
+			}
+
+		// Move Right
+		} else if (ch == KEY_RIGHT || ch == 'd') {
+			if (at_boundry(yCoord, xCoord+1) == 0) {
+				mvaddch(yCoord, xCoord, ' ');
+				xCoord++;
+				mvaddch(yCoord, xCoord, *player);
+			}
+
+		// Move Left
+		} else if (ch == KEY_LEFT || ch == 'a') {
+			if (at_boundry(yCoord, xCoord-1) == 0) {
+				mvaddch(yCoord, xCoord, ' ');
+				xCoord--;
+				mvaddch(yCoord, xCoord, *player);
+			}
+
+		// Move Down
+		} else if (ch == KEY_DOWN || ch == 's') {
+			if (at_boundry(yCoord, xCoord+1) == 0) {
+				mvaddch(yCoord, xCoord, ' ');
+				yCoord++;
+				mvaddch(yCoord, xCoord, *player);
+			}
+		}
+
+		// Refresh
+		refresh();
+	// Must be at door and have required number of keys
+	} while (numKeys != reqKeys || atDoor != true);
+	attroff(COLOR_PAIR(1));
+}
+
+int at_boundry(int yCoord, int xCoord) {
+	// Get terminal dimensions
+	int yMax, xMax;
+        getmaxyx(stdscr, yMax, xMax);
+	
+	// Check if character hits border
+	if (yCoord == (yMax/2-16) || yCoord == (yMax/2+14) || xCoord == (xMax/2 + 40) || xCoord == (xMax/2 - 41)) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+void pause_prompt(int level) {
+	// Getting terminal dimensions
+	int yMax, xMax;
+	getmaxyx(stdscr, yMax, xMax);
+
+	// Sets the colour scheme depending on level
+        if (level == 1) {
+                init_pair(1, COLOR_WHITE, COLOR_BLUE);
+        } else if (level == 2) {
+                init_pair(1, COLOR_WHITE, COLOR_RED);
+        } else if (level == 3) {
+                init_pair(1, COLOR_WHITE, COLOR_BLACK);
+        }
+
+        // Creating small pause window
+	WINDOW *pauseWindow = newwin(3, 50, yMax / 2 - 1, (xMax - 50) / 2);
+
+	box(pauseWindow, 0, 0);
+	wbkgd(pauseWindow, COLOR_PAIR(1));
+        // Display the pause prompt in the new window
+	mvwprintw(pauseWindow, 1, 2, "Click 'p' to unpause the game.");
+	wrefresh(pauseWindow); // Refresh only the prompt window
+	
+	// Getting user input
+        char unpause;
+
+	// Unpausing only if user types 'p'
+	do {
+		unpause=wgetch(pauseWindow);
+	} while (unpause != 'p');
+	
+	// Clear and refresh pauseWindow
+	wclear(pauseWindow);
+	wrefresh(pauseWindow);
 }
