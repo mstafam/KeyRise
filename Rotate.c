@@ -15,33 +15,43 @@ int main() {
 	int levelOne = 1;
 	int levelTwo = 2;
 	int levelThree = 3;
-	// Initializing ncurses
+	int curWindow = 0;
+	int yMax, xMax;
+
+  getmaxyx(stdscr, yMax, xMax);
 	initscr();
+
+	WINDOW *gameWindow = newwin(30, 80, (yMax - 30) / 2, (xMax - 80) / 2);
+	box(gameWindow, 0, 0);
+
 	curs_set(0);
 	// Enabling color
 	start_color();
-	// Calling splashscreen
+	curWindow++;
 	splashscreen();
 	clear();
 	refresh();
-	// Calling level one
+	curWindow++;
 	display_level(levelOne);
-	getch();
+	getchar();
 	clear();
 	refresh();
 	// Calling level two
+	curWindow++;
 	display_level(levelTwo);
-	getch();
+	getchar();
 	clear();
 	refresh();
 	// Calling level three
+	curWindow++;
 	display_level(levelThree);
-	getch();
+	getchar();
 	clear();
 	refresh();
 	// Calling the endscreen
+	curWindow++;
 	endscreen();
-	getch();
+	getchar();
 	clear();
 	refresh();
 	// Return 0

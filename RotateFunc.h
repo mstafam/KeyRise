@@ -3,7 +3,14 @@
  * Lab: 9-11
  */
 
-// Function Prototypes
+#ifndef ROTATEFUNC_H
+#define ROTATEFUNC_H
+
+extern int player_x;
+extern int player_y;
+extern char player_char;
+
+// ... [Rest of your function prototypes]
 
 /*
  * purpose: Display the splash screen with game title and menu options
@@ -50,3 +57,6 @@ void level2(int yMax, int xMax);
  */
 void level3(int yMax, int xMax);
 
+void handle_input();
+
+#endif // ROTATEFUNC_H
