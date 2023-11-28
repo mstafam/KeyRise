@@ -203,6 +203,8 @@ void level1(int yMax, int xMax) {
     wattroff(level1, COLOR_PAIR(1));
 
     wrefresh(level1);
+
+    handle_input();
 }
 
 void level2(int yMax, int xMax) {
@@ -311,3 +313,58 @@ void level3(int yMax, int xMax) {
     wrefresh(level3);
 }
 
+bool isPaused = false;
+
+void show_quit_prompt() {
+    int yMax, xMax;
+    getmaxyx(stdscr, yMax, xMax);
+
+    // Create a small window for the quit prompt
+    WINDOW *quitWin = newwin(3, 50, yMax / 2 - 1, (xMax - 50) / 2);
+    box(quitWin, 0, 0); // Draw a border around the window
+
+    // Display the quit prompt in the new window
+    mvwprintw(quitWin, 1, 2, "Do you really want to quit? (y/n): ");
+    wrefresh(quitWin); // Refresh only the prompt window
+
+    char confirm = wgetch(quitWin);
+    delwin(quitWin); // Delete the quit prompt window
+
+    // Clear the part of the screen where the quit prompt was
+
+
+    refresh(); // Refresh the screen to reflect the changes
+
+    if (confirm == 'y') {
+        endwin();
+        exit(0);
+    }
+    
+    if (confirm == 'n'){
+        
+    }
+}
+
+
+void handle_input() {
+    char ch;
+    while (1) {
+        ch = getch(); // Get a character from the user
+
+        if (ch == 'q') {
+            show_quit_prompt();
+        } else if (ch == 'p') {
+            if (!isPaused) {
+                isPaused = true;
+                mvprintw(25, 0, "Game Paused. Press 'p' to resume.");
+                refresh(); // Refresh only the required part of the screen
+            } else {
+                isPaused = false;
+                // Do not clear the screen; just refresh if needed
+                refresh();
+            }
+        }
+
+        // Additional game loop code goes here...
+    }
+}
