@@ -11,62 +11,21 @@
 # include "RotateFunc.h"
 
 int main() {
-	// Creating level variables
-	int levelOne = 1;
-	int levelTwo = 2;
-	int levelThree = 3;
-<<<<<<< HEAD
-	// Initializing ncurses
-=======
-	int curWindow = 0;
-	int yMax, xMax;
-
-  getmaxyx(stdscr, yMax, xMax);
-
->>>>>>> origin/Samis-Branch
-	initscr();
-
-	WINDOW *gameWindow = newwin(30, 80, (yMax - 30) / 2, (xMax - 80) / 2);
-	box(gameWindow, 0, 0);
-
+	// Initialization
+	initscr(); noecho(); cbreak();
 	curs_set(0);
 	// Enabling color
 	start_color();
-<<<<<<< HEAD
-	// Calling splashscreen
+	// Calling splash screen
 	splashscreen();
-	clear();
-	refresh();
 	// Calling level one
-=======
-	curWindow++;
-	splashscreen();
-	clear();
-	refresh();
-	curWindow++;
->>>>>>> origin/Samis-Branch
-	display_level(levelOne);
-	getchar();
-	clear();
-	refresh();
+	display_level(1);
 	// Calling level two
-	curWindow++;
-	display_level(levelTwo);
-	getchar();
-	clear();
-	refresh();
+	display_level(2);
 	// Calling level three
-	curWindow++;
-	display_level(levelThree);
-	getchar();
-	clear();
-	refresh();
+	display_level(3);
 	// Calling the endscreen
-	curWindow++;
 	endscreen();
-	getchar();
-	clear();
-	refresh();
 	// Return 0
 	return 0;
 }

@@ -3,20 +3,9 @@
  * Lab: 9-11
  */
 
-<<<<<<< HEAD
 // Function Prototypes
-=======
 #ifndef ROTATEFUNC_H
 #define ROTATEFUNC_H
-
-extern int player_x;
-extern int player_y;
-extern char player_char;
-
-// ... [Rest of your function prototypes]
-
-
->>>>>>> origin/Samis-Branch
 
 /*
  * purpose: Display the splash screen with game title and menu options
@@ -63,6 +52,32 @@ void level2(int yMax, int xMax);
  */
 void level3(int yMax, int xMax);
 
-void handle_input();
+/*
+ * purpose: Gets user input for movement, and quit and pause prompts
+ * params:  None
+ * return:  Void
+ */
+void user_input();
 
+/*
+ * purpose: Displays the quit prompt
+ * params:  None
+ * return:  Void
+ */
+void quit_prompt();
+
+/*
+ * purpose: Checks if the character hits a boundry
+ * params:  int yCoord, int xCoord
+ * return:  0 or 1
+ */
+
+int at_boundry(int yCoord, int xCoord);
+
+/*
+ * purpose: Displays the pause prompt
+ * params:  None
+ * return:  Void
+ */
+void pause_prompt();
 #endif // ROTATEFUNC_H
