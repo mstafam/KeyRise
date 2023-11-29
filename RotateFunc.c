@@ -233,11 +233,11 @@ void level2(int yMax, int xMax) {
     mvwprintw(level2, 13, 31, "-------------------------------------------------");
     wattroff(level2, COLOR_PAIR(5));
     wattron(level2, COLOR_PAIR(2));
-    mvwprintw(level2, 18, 31, "|----|");
-    mvwprintw(level2, 17, 31, "|----|");
-    mvwprintw(level2, 16, 31, "|----|");
-    mvwprintw(level2, 15, 31, "|----|");
-    mvwprintw(level2, 14, 31, "|----|");
+    mvwprintw(level2, 18, 31, "|---|");
+    mvwprintw(level2, 17, 31, "|---|");
+    mvwprintw(level2, 16, 31, "|---|");
+    mvwprintw(level2, 15, 31, "|---|");
+    mvwprintw(level2, 14, 31, "|---|");
     wattroff(level2, COLOR_PAIR(2));
 
     wattron(level2, COLOR_PAIR(4));
@@ -290,17 +290,17 @@ void level3(int yMax, int xMax) {
     mvwprintw(level3, 13, 51, "-----------------------------");
     wattroff(level3, COLOR_PAIR(3));
     wattron(level3, COLOR_PAIR(2));
-    mvwprintw(level3, 13, 21, "|----|");
-    mvwprintw(level3, 14, 21, "|----|");
-    mvwprintw(level3, 15, 21, "|----|");
-    mvwprintw(level3, 16, 21, "|----|");
-    mvwprintw(level3, 17, 21, "|----|");
+    mvwprintw(level3, 13, 21, "|---|");
+    mvwprintw(level3, 14, 21, "|---|");
+    mvwprintw(level3, 15, 21, "|---|");
+    mvwprintw(level3, 16, 21, "|---|");
+    mvwprintw(level3, 17, 21, "|---|");
     
-    mvwprintw(level3, 17, 45, "|----|");
-    mvwprintw(level3, 16, 45, "|----|");
-    mvwprintw(level3, 15, 45, "|----|");
-    mvwprintw(level3, 14, 45, "|----|");
-    mvwprintw(level3, 13, 45, "|----|");
+    mvwprintw(level3, 17, 45, "|---|");
+    mvwprintw(level3, 16, 45, "|---|");
+    mvwprintw(level3, 15, 45, "|---|");
+    mvwprintw(level3, 14, 45, "|---|");
+    mvwprintw(level3, 13, 45, "|---|");
 
     wattroff(level3, COLOR_PAIR(2));
     wattron(level3, COLOR_PAIR(2));
@@ -417,7 +417,7 @@ void user_input(int yMax, int xMax, int level) {
                 mvaddch(playerYCoord + yCoord, playerXCoord + xCoord, ' ');
                 playerXCoord++;
                 mvaddch(playerYCoord + yCoord, playerXCoord + xCoord, *player);
-		refresh();
+		        refresh();
             }
 
         // Move Left
@@ -490,7 +490,7 @@ void user_input(int yMax, int xMax, int level) {
 	refresh();
 
 	// Must be at door and have required number of keys
-	} while ( numKeys < reqKeys|| (playerXCoord < doorxCoord));
+	} while ( numKeys < reqKeys|| (playerXCoord < doorxCoord)); 
 	attroff(COLOR_PAIR(1));
 }
 
@@ -498,16 +498,17 @@ int at_boundry(int level, int yCoord, int xCoord) {
 	// Boundry checking for level 1
 	if (level == 1) {
 		if (yCoord == 0 || yCoord == 30 || xCoord == 0 || xCoord == 80) {
-                	return 1;
+
+                    return 1;
         	} 
 	// Boundry checking for level 2
 	} else if (level == 2) {
-		if (yCoord == 0 || yCoord == 30 || xCoord == 0 || xCoord == 80) {
+		if (yCoord == 0 || yCoord == 30 || xCoord == 0 || xCoord == 80 || (xCoord == 31 && yCoord == 18)) {
                 	return 1;
         	}
 	// Boundry checking for level 3
 	} else if (level == 3) {
-		if (yCoord == 0 || yCoord == 30 || xCoord == 0 || xCoord == 80) {
+		if (yCoord == 0 || yCoord == 30 || xCoord == 0 || xCoord == 80 || (xCoord == 21 && yCoord == 12) || (xCoord == 24 && yCoord == 17) || (xCoord == 45 && yCoord == 17)) {
                 	return 1;
         	}	
 	}
