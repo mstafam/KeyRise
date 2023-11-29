@@ -68,11 +68,11 @@ void quit_prompt();
 
 /*
  * purpose: Checks if the character hits a boundry
- * params:  int yCoord, int xCoord
+ * params:  int level, int yCoord, int xCoord
  * return:  0 or 1
  */
 
-int at_boundry(int yCoord, int xCoord);
+int at_boundry(int level, int yCoord, int xCoord);
 
 /*
  * purpose: Displays the pause prompt
