@@ -26,7 +26,6 @@ int main() {
 	display_level(3);
 	// Calling the endscreen
 	endscreen();
-	getch();
 	// Return 0
 	return 0;
 }

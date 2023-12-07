@@ -178,9 +178,16 @@ void endscreen() {
         box(endscreen, 0, 0);
         wrefresh(endscreen);
 	// print to endscreen
-        mvwprintw(endscreen, 15, 24, "You Win! Click any key to exit.");
+        mvwprintw(endscreen, 15, 24, "You Win! Click 'E' to exit.");
 	wrefresh(endscreen);
-	getch();
+	// Exit variable
+	int exitCH;
+
+	do {
+		exitCH=wgetch(endscreen);
+	} while (exitCH != 'e');
+	
+	// Exit
 	endwin();
 	exit(0);
 }
