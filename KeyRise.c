@@ -8,7 +8,7 @@
 # include <stdlib.h>
 # include <signal.h>
 # include <ncurses.h>
-# include "RotateFunc.h"
+# include "KeyRiseFunc.h"
 
 int main() {
 	// Initialization
@@ -26,6 +26,7 @@ int main() {
 	display_level(3);
 	// Calling the endscreen
 	endscreen();
+	getch();
 	// Return 0
 	return 0;
 }

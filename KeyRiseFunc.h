@@ -4,8 +4,8 @@
  */
 
 // Function Prototypes
-#ifndef ROTATEFUNC_H
-#define ROTATEFUNC_H
+#ifndef KEYRISEFUNC_H
+#define KEYRISEFUNC_H
 
 /*
  * purpose: Display the splash screen with game title and menu options
@@ -80,4 +80,4 @@ int at_boundry(int level, int yCoord, int xCoord);
  * return:  Void
  */
 void pause_prompt();
-#endif // ROTATEFUNC_H
+#endif // KEYRISEFUNC_H

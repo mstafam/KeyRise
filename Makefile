@@ -5,15 +5,19 @@
 CC=gcc
 CFLAGS=-Wall -std=c11
 
-# Creates Rotate Executable
-Rotate: Rotate.o RotateFunc.o
+# Creates KeyRise Executable
+KeyRise: KeyRise.o KeyRiseFunc.o
 	$(CC) $(CFLAGS) $^ -lm -lc -lncurses -ltinfo -o $@
 
 # Creates .o files from all .c files
 %.o: %.c
 	$(CC) $(CFLAGS) $^ -c
 
-# Creates phony target called clean. Removes Rotate and all .o files
+# Creates phony target called clean. Removes KeyRise and all .o files
 .PHONY: clean
 clean:
-	rm -f Rotate *.o
+	rm -f KeyRise *.o
+
+# Doxygen target
+doc:
+	doxygen Doxyfile

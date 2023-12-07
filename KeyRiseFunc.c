@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ncurses.h>
-#include "RotateFunc.h"
+#include "KeyRiseFunc.h"
 #include <string.h>
 #include <unistd.h>
 #include <time.h>
@@ -33,8 +33,7 @@ void how_to_play() {
     mvwprintw(howWin, 3, 1, "1. Use the arrow keys to navigate");
     mvwprintw(howWin, 4, 1, "2. Use spacebar to jump");
     mvwprintw(howWin, 5, 1, "3. Collect all keys to win");
-    mvwprintw(howWin, 6, 1, "4. Beware! The map will rotate every few seconds and rotate faster over time");
-    mvwprintw(howWin, 8, 1, "Press any key to return to menu");
+    mvwprintw(howWin, 7, 1, "Press any key to return to menu");
 
     wrefresh(howWin);
 
@@ -69,10 +68,15 @@ void splashscreen() {
 
     // Print the game title in red
     wattron(splash, COLOR_PAIR(3));
-    mvwprintw(splash, 5, 15, "   ___  ____  _________ __________    ___  ___ ");
-    mvwprintw(splash, 6, 15, "  / _ \\/ __ \\/_  __/ _ /_  __/ __/___/ _ \\/ _ \\");
-    mvwprintw(splash, 7, 15, " / , _/ /_/ / / / / __ |/ / / _//___/\\_, / // /");
-    mvwprintw(splash, 8, 15, "/_/|_|\\____/ /_/ /_/ |_/_/ /___/    /___/\\___/ ");
+    mvwprintw(splash, 5, 21, "  _  __          _____  _           ");
+    mvwprintw(splash, 6, 21, " | |/ /         |  __ \\(_)          ");
+    mvwprintw(splash, 7, 21, " | ' / ___ _   _| |__) |_ ___  ___  ");
+    mvwprintw(splash, 8, 21, " |  < / _ \\ | | |  _  /| / __|/ _ \\ ");
+    mvwprintw(splash, 9, 21, " | . \\  __/ |_| | | \\ \\| \\__ \\  __/ ");
+    mvwprintw(splash, 10, 21, " |_|\\_\\___|\\__, |_|  \\_\\_|___/\\___| ");
+    mvwprintw(splash, 11, 21, "            __/ |                   ");
+    mvwprintw(splash, 12, 21, "           |___/                    ");
+
     wattroff(splash, COLOR_PAIR(3));
 
     // Choices for the main menu
@@ -90,7 +94,7 @@ void splashscreen() {
                 wattron(splash, COLOR_PAIR(2));
 
             // Print the menu item in the center of the window
-            mvwprintw(splash, 12 + i * 2, (80 - strlen(choices[i])) / 2, "%s", choices[i]);
+            mvwprintw(splash, 17 + i * 2, (80 - strlen(choices[i])) / 2, "%s", choices[i]);
 
             wattroff(splash, COLOR_PAIR(2));
 
@@ -290,6 +294,7 @@ void level3(int yMax, int xMax) {
     mvwprintw(level3, 13, 50, "------------------------------");
     wattroff(level3, COLOR_PAIR(3));
     wattron(level3, COLOR_PAIR(2));
+    // Printing ladders
     mvwprintw(level3, 13, 21, "|---|");
     mvwprintw(level3, 14, 21, "|---|");
     mvwprintw(level3, 15, 21, "|---|");
@@ -365,20 +370,29 @@ void quit_prompt(int level) {
 }
 
 void user_input(int yMax, int xMax, int level) {
+    // Coord, keys, ladder, player, and npc variables
     int numKeys = 0, reqKeys;
     int yCoord = (yMax/2-15); int xCoord = (xMax/2-40);
-    // Key coords
     int keyY; int keyX; int keyY1; int keyX1; int keyY2; int keyX2;
-    // Ladder coords
     int ladderX; int ladderY; int ladderX1; int ladderY1;
     bool gotKey1 = false; bool gotKey2 = false; bool gotKey3 = false;
     int ch;
     int playerYCoord; int playerXCoord;
     int doorxCoord = 76;
+    // player
     char *player = malloc(sizeof(char));
+    // npc
+    char *npc = malloc(sizeof(char));
+    int npcDir = 1;
+    bool talked = false;
+    int npcX = 20; int npcY = 18; int npcLeftX = 12; int npcRightX = 27;
+    clock_t lastTime = clock();
+    double npcMoveTime = 0.5; // 1 second
+	
     keypad(stdscr, true);
+    nodelay(stdscr, true);
 
-    // Sets the colour scheme depending on level
+    // Sets the colour scheme, keys, and ladders depending on level
     if (level == 1) {
 	keyY = 18, keyX = 35;
 	playerYCoord = 18, playerXCoord = 1;
@@ -399,16 +413,84 @@ void user_input(int yMax, int xMax, int level) {
     }
     
     attron(COLOR_PAIR(1));
-
+    // Making npc and player characters
+    *npc = '$';
     *player = '&';
     mvaddch(playerYCoord + yCoord, playerXCoord + xCoord, *player);
+    // Place npc on level
+    if (level == 1) {
+    	mvaddch(yCoord + npcY, xCoord + npcX, *npc);
+    }
+    // Place player on level
+    mvprintw(playerYCoord + yCoord, playerXCoord + xCoord + 1, "                  ");
+    refresh();
+    // Hints and information
     mvprintw(0, 0, "Keys Collected: 0");
     if (level == 2 || level == 3) {
         mvprintw(yMax/2 - 15, xMax/2 - 40, "Hint: Press 'l' when next to ladder to use it.");
+    } else if (level == 1) {
+    	mvprintw(yMax/2 - 15, xMax/2 - 40, "Hint: Press 't' next to the npc to talk to him.");
     }
+	
     do {
+	// get current time and check elapsedTime
+	clock_t currentTime = clock();
+	double elapsedTime = (double)(currentTime-lastTime) / CLOCKS_PER_SEC;
+	if (level == 1) {
+		// Check if the enough time has passed to move the npc
+		if (elapsedTime > npcMoveTime || elapsedTime == npcMoveTime) {
+			// Change direction and endpoints
+			if (npcX > npcRightX) {
+				npcDir = 0;
+			} else if (npcX < npcLeftX) {
+				npcDir = 1;
+			}
+			// Move the npc
+			if (npcDir == 1) {
+				mvaddch(yCoord + npcY, xCoord + npcX, ' ');
+				npcX++;
+				mvaddch(yCoord + npcY, xCoord + npcX, *npc);
+			} else if (npcDir == 0) {
+				mvaddch(yCoord + npcY, xCoord + npcX, ' ');
+				npcX--;
+				mvaddch(yCoord + npcY, xCoord + npcX, *npc);
+			}
+			// Update to current time and refresh
+			lastTime = currentTime;
+			refresh();
+		}
+	}
+	// Check if the user is next to npc and clicks 't'
+	if (level == 1) {
+		if (talked == false) {
+			if (((playerXCoord == npcX + 1) || (playerXCoord == npcX - 1)) && ch == 't' ) {
+				// Text bubble
+            			WINDOW *textBubble = newwin(7, 54, yMax / 2 - 7, (xMax - 50) / 2);
+            			box(textBubble, 0, 0);
+				wbkgd(textBubble, COLOR_PAIR(1));
+				// Print to the window
+            			mvwprintw(textBubble, 1, 2, "YoYo Im Mista Dolla! Here's a helpful tip for ya,");
+            			mvwprintw(textBubble, 2, 2, "climb the ladders by clicking 'l' and collect all");
+            			mvwprintw(textBubble, 3, 2, "those keys!");
+				mvwprintw(textBubble, 5, 11, "Press R to return to the game");
+            			wrefresh(textBubble);
+				
+				// Check if 'r' is pressed, then close window
+				int close;
+				do {
+					close=wgetch(textBubble);
+				} while (close != 'r');
+
+				wclear(textBubble);
+				wrefresh(textBubble);
+				// Set talked to true so user can speak to npc once only
+				talked = true;
+			}
+		}
+	}
+
 	// Get character
-        ch = getch();
+	ch = getch();
 
         mvprintw(1, 0, "Player Position: x=%d, y=%d", playerXCoord, playerYCoord);
 	// Open quit prompt
@@ -437,7 +519,7 @@ void user_input(int yMax, int xMax, int level) {
             }
         }
 	
-	// Key check for each level
+	// Key check and ladders for each level
 	// Check keys for level 1
 	if (level == 1) {
 		// Checks if player is at key coordinate
@@ -450,7 +532,7 @@ void user_input(int yMax, int xMax, int level) {
 			mvprintw(0,0, "Keys Collected: %d", numKeys);
 		}
 	
-	// Check keys for level 2	
+	// Keys and ladder for level 2	
 	} else if (level == 2) {
 		// Checks if player is at key coordinates
                 if (playerYCoord == keyY && playerXCoord == keyX && gotKey1 == false) {
@@ -467,6 +549,7 @@ void user_input(int yMax, int xMax, int level) {
                         mvprintw(keyY1+yCoord, keyX1+xCoord+1, " ");
                         mvprintw(keyY1+yCoord, keyX1+xCoord+2, " ");
                         mvprintw(0,0, "Keys Collected: %d", numKeys);
+		// Level 2 ladder
 		} else if (playerYCoord == ladderY && playerXCoord == ladderX) {
 			if (ch == 'l') {
 				mvaddch(playerYCoord + yCoord, playerXCoord + xCoord, ' ');
@@ -475,6 +558,7 @@ void user_input(int yMax, int xMax, int level) {
 				mvaddch(playerYCoord + yCoord, playerXCoord + xCoord, *player);
                 		refresh();
 			}			
+		// Level 2 ladder
 		} else if (playerYCoord == ladderY - 6 && playerXCoord == ladderX + 2) {
 			if (ch == 'l') {
                                 mvaddch(playerYCoord + yCoord, playerXCoord + xCoord, ' ');
@@ -485,7 +569,7 @@ void user_input(int yMax, int xMax, int level) {
                         }
 		}
 	
-	// Check keys for level 3	
+	// Keys and ladder for level 3	
 	} else if (level == 3) {
 		// Checks if player is at key coordinates
                 if (playerYCoord == keyY && playerXCoord == keyX && gotKey1 == false) {
@@ -509,6 +593,7 @@ void user_input(int yMax, int xMax, int level) {
                         mvprintw(keyY2+yCoord, keyX2+xCoord+1, " ");
                         mvprintw(keyY2+yCoord, keyX2+xCoord+2, " ");
                         mvprintw(0,0, "Keys Collected: %d", numKeys);
+		// Level 3 ladder #1
 		} else if (playerYCoord == ladderY && playerXCoord == ladderX) {
                         if (ch == 'l') {
                                 mvaddch(playerYCoord + yCoord, playerXCoord + xCoord, ' ');
@@ -517,6 +602,7 @@ void user_input(int yMax, int xMax, int level) {
                                 mvaddch(playerYCoord + yCoord, playerXCoord + xCoord, *player);
                                 refresh();
                         }
+		// Level 3 ladder #1
                 } else if (playerYCoord == ladderY + 5 && playerXCoord == ladderX + 6) {
                         if (ch == 'l') {
                                 mvaddch(playerYCoord + yCoord, playerXCoord + xCoord, ' ');
@@ -525,6 +611,7 @@ void user_input(int yMax, int xMax, int level) {
                                 mvaddch(playerYCoord + yCoord, playerXCoord + xCoord, *player);
                                 refresh();
                         }
+		// Level 3 ladder #2
                 } else if (playerYCoord == ladderY1 && playerXCoord == ladderX1) {
                         if (ch == 'l') {
                                 mvaddch(playerYCoord + yCoord, playerXCoord + xCoord, ' ');
@@ -533,6 +620,7 @@ void user_input(int yMax, int xMax, int level) {
                                 mvaddch(playerYCoord + yCoord, playerXCoord + xCoord, *player);
                                 refresh();
                         }
+		// Level 3 ladder #2
                 } else if (playerYCoord == ladderY1 - 5 && playerXCoord == ladderX1 + 6) {
                         if (ch == 'l') {
                                 mvaddch(playerYCoord + yCoord, playerXCoord + xCoord, ' ');
