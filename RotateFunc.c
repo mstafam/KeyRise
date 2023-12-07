@@ -201,7 +201,7 @@ void level1(int yMax, int xMax) {
 
     // Create keys and display level name and level door
     wattron(level1, COLOR_PAIR(3));
-    mvwprintw(level1, 5, 29, "Level 1: Grassy Plains");
+    mvwprintw(level1, 5, 29, "Level 1: Blue Skies");
     mvwprintw(level1, 18, 35, "O-X");
     mvwprintw(level1, 15, 76, " __ ");
     mvwprintw(level1, 16, 76, "|  |");
@@ -287,7 +287,7 @@ void level3(int yMax, int xMax) {
     wattron(level3, COLOR_PAIR(3));	    
     mvwprintw(level3, 13, 0, "----------------------");
     mvwprintw(level3, 18, 21, "------------------------------");
-    mvwprintw(level3, 13, 51, "-----------------------------");
+    mvwprintw(level3, 13, 50, "------------------------------");
     wattroff(level3, COLOR_PAIR(3));
     wattron(level3, COLOR_PAIR(2));
     mvwprintw(level3, 13, 21, "|---|");
@@ -305,9 +305,9 @@ void level3(int yMax, int xMax) {
     wattroff(level3, COLOR_PAIR(2));
     wattron(level3, COLOR_PAIR(2));
     // Printing Keys
-    mvwprintw(level3, 12, 8, "o-X");
-    mvwprintw(level3, 17, 37, "o-X");
-    mvwprintw(level3, 12, 65, "o-X");
+    mvwprintw(level3, 12, 8, "O-X");
+    mvwprintw(level3, 17, 37, "O-X");
+    mvwprintw(level3, 12, 65, "O-X");
     // Level Door
     mvwprintw(level3, 9, 76, " __ ");
     mvwprintw(level3, 10, 76, "|  |");
@@ -362,13 +362,15 @@ void quit_prompt(int level) {
 		wclear(quitWindow);
 		wrefresh(quitWindow);
 	}
-
 }
 
 void user_input(int yMax, int xMax, int level) {
     int numKeys = 0, reqKeys;
     int yCoord = (yMax/2-15); int xCoord = (xMax/2-40);
+    // Key coords
     int keyY; int keyX; int keyY1; int keyX1; int keyY2; int keyX2;
+    // Ladder coords
+    int ladderX; int ladderY; int ladderX1; int ladderY1;
     bool gotKey1 = false; bool gotKey2 = false; bool gotKey3 = false;
     int ch;
     int playerYCoord; int playerXCoord;
@@ -385,20 +387,25 @@ void user_input(int yMax, int xMax, int level) {
     } else if (level == 2) {
         reqKeys = 2;
 	keyY = 18, keyX = 15, keyY1 = 12, keyX1 = 48;
+	ladderX = 30; ladderY = 18;
 	playerYCoord = 18, playerXCoord = 1;
         init_pair(1, COLOR_WHITE, COLOR_RED);
     } else if (level == 3) {
-        reqKeys = 3;
+	reqKeys = 3;
 	keyY = 12, keyX = 8, keyY1 = 17, keyX1 = 37, keyY2 = 12, keyX2 = 65;
+	ladderX = 20; ladderY = 12; ladderX1 = 44; ladderY1 = 17;
 	playerYCoord = 12, playerXCoord = 1;
         init_pair(1, COLOR_WHITE, COLOR_BLACK);
     }
     
     attron(COLOR_PAIR(1));
+
     *player = '&';
     mvaddch(playerYCoord + yCoord, playerXCoord + xCoord, *player);
-
     mvprintw(0, 0, "Keys Collected: 0");
+    if (level == 2 || level == 3) {
+        mvprintw(yMax/2 - 15, xMax/2 - 40, "Hint: Press 'l' when next to ladder to use it.");
+    }
     do {
 	// Get character
         ch = getch();
@@ -436,55 +443,105 @@ void user_input(int yMax, int xMax, int level) {
 		// Checks if player is at key coordinate
 		if (playerYCoord == keyY && playerXCoord == keyX && gotKey1 == false) {
 			// Adds 1 to numKeys
-			// gotKey1 = true;
+			gotKey1 = true;
 			numKeys++;
 			mvprintw(keyY+yCoord, keyX+xCoord+1, " ");
 			mvprintw(keyY+yCoord, keyX+xCoord+2, " ");
 			mvprintw(0,0, "Keys Collected: %d", numKeys);
 		}
+	
 	// Check keys for level 2	
 	} else if (level == 2) {
 		// Checks if player is at key coordinates
                 if (playerYCoord == keyY && playerXCoord == keyX && gotKey1 == false) {
                         // Adds 1 to numKeys
-			// gotKey1 = true;
+			gotKey1 = true;
                         numKeys++;
                         mvprintw(keyY+yCoord, keyX+xCoord+1, " ");
                         mvprintw(keyY+yCoord, keyX+xCoord+2, " ");
                         mvprintw(0,0, "Keys Collected: %d", numKeys);
                 } else if (playerYCoord == keyY1 && playerXCoord == keyX1 && gotKey2 == false) {
 			// Adds 1 to numKeys
-                        // gotKey2 = true;
+                        gotKey2 = true;
                         numKeys++;
-                        mvprintw(keyY+yCoord, keyX+xCoord+1, " ");
-                        mvprintw(keyY+yCoord, keyX+xCoord+2, " ");
+                        mvprintw(keyY1+yCoord, keyX1+xCoord+1, " ");
+                        mvprintw(keyY1+yCoord, keyX1+xCoord+2, " ");
                         mvprintw(0,0, "Keys Collected: %d", numKeys);
+		} else if (playerYCoord == ladderY && playerXCoord == ladderX) {
+			if (ch == 'l') {
+				mvaddch(playerYCoord + yCoord, playerXCoord + xCoord, ' ');
+				playerXCoord = playerXCoord + 2;
+				playerYCoord = playerYCoord - 6;
+				mvaddch(playerYCoord + yCoord, playerXCoord + xCoord, *player);
+                		refresh();
+			}			
+		} else if (playerYCoord == ladderY - 6 && playerXCoord == ladderX + 2) {
+			if (ch == 'l') {
+                                mvaddch(playerYCoord + yCoord, playerXCoord + xCoord, ' ');
+                                playerXCoord = playerXCoord - 2;
+                                playerYCoord = playerYCoord + 6;
+                                mvaddch(playerYCoord + yCoord, playerXCoord + xCoord, *player);
+                                refresh();
+                        }
 		}
+	
 	// Check keys for level 3	
 	} else if (level == 3) {
 		// Checks if player is at key coordinates
                 if (playerYCoord == keyY && playerXCoord == keyX && gotKey1 == false) {
                         // Adds 1 to numKeys
-                        // gotKey1 = true;
+                        gotKey1 = true;
 			numKeys++;
                         mvprintw(keyY+yCoord, keyX+xCoord+1, " ");
                         mvprintw(keyY+yCoord, keyX+xCoord+2, " ");
                         mvprintw(0,0, "Keys Collected: %d", numKeys);
                 } else if (playerYCoord == keyY1 && playerXCoord == keyX1 && gotKey2 == false) {
 			// Adds 1 to numKeys
-                        // gotKey2 = true;
+                        gotKey2 = true;
                         numKeys++;
-                        mvprintw(keyY+yCoord, keyX+xCoord+1, " ");
-                        mvprintw(keyY+yCoord, keyX+xCoord+2, " ");
+                        mvprintw(keyY1+yCoord, keyX1+xCoord+1, " ");
+                        mvprintw(keyY1+yCoord, keyX1+xCoord+2, " ");
                         mvprintw(0,0, "Keys Collected: %d", numKeys);
 		} else if (playerYCoord == keyY2 && playerXCoord == keyX2 && gotKey3 == false) {
 			// Adds 1 to numKeys
-                        // gotKey3 = true;
+                        gotKey3 = true;
                         numKeys++;
-                        mvprintw(keyY+yCoord, keyX+xCoord+1, " ");
-                        mvprintw(keyY+yCoord, keyX+xCoord+2, " ");
+                        mvprintw(keyY2+yCoord, keyX2+xCoord+1, " ");
+                        mvprintw(keyY2+yCoord, keyX2+xCoord+2, " ");
                         mvprintw(0,0, "Keys Collected: %d", numKeys);
-		}
+		} else if (playerYCoord == ladderY && playerXCoord == ladderX) {
+                        if (ch == 'l') {
+                                mvaddch(playerYCoord + yCoord, playerXCoord + xCoord, ' ');
+                                playerXCoord = playerXCoord + 6;
+                                playerYCoord = playerYCoord + 5;
+                                mvaddch(playerYCoord + yCoord, playerXCoord + xCoord, *player);
+                                refresh();
+                        }
+                } else if (playerYCoord == ladderY + 5 && playerXCoord == ladderX + 6) {
+                        if (ch == 'l') {
+                                mvaddch(playerYCoord + yCoord, playerXCoord + xCoord, ' ');
+                                playerXCoord = playerXCoord - 6;
+                                playerYCoord = playerYCoord - 5;
+                                mvaddch(playerYCoord + yCoord, playerXCoord + xCoord, *player);
+                                refresh();
+                        }
+                } else if (playerYCoord == ladderY1 && playerXCoord == ladderX1) {
+                        if (ch == 'l') {
+                                mvaddch(playerYCoord + yCoord, playerXCoord + xCoord, ' ');
+                                playerXCoord = playerXCoord + 6;
+                                playerYCoord = playerYCoord - 5;
+                                mvaddch(playerYCoord + yCoord, playerXCoord + xCoord, *player);
+                                refresh();
+                        }
+                } else if (playerYCoord == ladderY1 - 5 && playerXCoord == ladderX1 + 6) {
+                        if (ch == 'l') {
+                                mvaddch(playerYCoord + yCoord, playerXCoord + xCoord, ' ');
+                                playerXCoord = playerXCoord - 6;
+                                playerYCoord = playerYCoord + 5;
+                                mvaddch(playerYCoord + yCoord, playerXCoord + xCoord, *player);
+                                refresh();
+                        }
+                }
 	}
 	// Refresh
 	refresh();
@@ -503,12 +560,12 @@ int at_boundry(int level, int yCoord, int xCoord) {
         	} 
 	// Boundry checking for level 2
 	} else if (level == 2) {
-		if (yCoord == 0 || yCoord == 30 || xCoord == 0 || xCoord == 80 || (xCoord == 31 && yCoord == 18)) {
+		if (yCoord == 0 || yCoord == 30 || xCoord == 0 || xCoord == 80 || (xCoord == 31 && yCoord == 18) || (xCoord == 31 && yCoord == 12)) {
                 	return 1;
         	}
 	// Boundry checking for level 3
 	} else if (level == 3) {
-		if (yCoord == 0 || yCoord == 30 || xCoord == 0 || xCoord == 80 || (xCoord == 21 && yCoord == 12) || (xCoord == 24 && yCoord == 17) || (xCoord == 45 && yCoord == 17)) {
+		if (yCoord == 0 || yCoord == 30 || xCoord == 0 || xCoord == 80 || (xCoord == 21 && yCoord == 12) || (xCoord == 24 && yCoord == 17) || (xCoord == 45 && yCoord == 17) || (xCoord == 25 && yCoord == 17) || (xCoord == 49 && yCoord == 12)) {
                 	return 1;
         	}	
 	}
